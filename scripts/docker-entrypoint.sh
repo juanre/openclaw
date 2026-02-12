@@ -8,7 +8,7 @@ CONFIG_FILE="$STATE_DIR/openclaw.json"
 
 if [ ! -f "$CONFIG_FILE" ]; then
   mkdir -p "$STATE_DIR"
-  echo '{"gateway":{"controlUi":{"allowInsecureAuth":true}}}' > "$CONFIG_FILE"
+  echo '{"gateway":{"controlUi":{"allowInsecureAuth":true}},"agents":{"defaults":{"model":{"primary":"openai/gpt-4o"}}}}' > "$CONFIG_FILE"
 fi
 
 exec node openclaw.mjs gateway --allow-unconfigured --bind lan

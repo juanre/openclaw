@@ -16,7 +16,7 @@ Deploy OpenClaw on Render using Infrastructure as Code. The included `render.yam
 Clicking this link will:
 
 1. Create a new Render service from the `render.yaml` Blueprint at the root of this repo.
-2. Prompt you to set `SETUP_PASSWORD`
+2. Prompt you to set `OPENCLAW_GATEWAY_PASSWORD` and `OPENAI_API_KEY`
 3. Build the Docker image and deploy
 
 Once deployed, your service URL follows the pattern `https://<service-name>.onrender.com`.
@@ -31,12 +31,15 @@ services:
   - type: web
     name: openclaw
     runtime: docker
-    plan: starter
+    plan: standard
     healthCheckPath: /health
+    dockerCommand: /app/scripts/docker-entrypoint.sh
     envVars:
-      - key: PORT
+      - key: OPENCLAW_GATEWAY_PORT
         value: "8080"
-      - key: SETUP_PASSWORD
+      - key: OPENCLAW_GATEWAY_PASSWORD
+        sync: false # prompts during deploy
+      - key: OPENAI_API_KEY
         sync: false # prompts during deploy
       - key: OPENCLAW_STATE_DIR
         value: /data/.openclaw
@@ -56,6 +59,7 @@ Key Blueprint features used:
 | --------------------- | ---------------------------------------------------------- |
 | `runtime: docker`     | Builds from the repo's Dockerfile                          |
 | `healthCheckPath`     | Render monitors `/health` and restarts unhealthy instances |
+| `dockerCommand`       | Runs the entrypoint script that seeds config on first boot |
 | `sync: false`         | Prompts for value during deploy (secrets)                  |
 | `generateValue: true` | Auto-generates a cryptographically secure value            |
 | `disk`                | Persistent storage that survives redeploys                 |
@@ -68,22 +72,18 @@ Key Blueprint features used:
 | Starter   | Never             | 1GB+          | Personal use, small teams     |
 | Standard+ | Never             | 1GB+          | Production, multiple channels |
 
-The Blueprint defaults to `starter`. To use free tier, change `plan: free` in your fork's
+The Blueprint defaults to `standard`. To use free tier, change `plan: free` in your fork's
 `render.yaml` (but note: no persistent disk means config resets on each deploy).
 
 ## After deployment
 
-### Complete the setup wizard
-
-1. Navigate to `https://<your-service>.onrender.com/setup`
-2. Enter your `SETUP_PASSWORD`
-3. Select a model provider and paste your API key
-4. Optionally configure messaging channels (Telegram, Discord, Slack)
-5. Click **Run setup**
-
 ### Access the Control UI
 
-The web dashboard is available at `https://<your-service>.onrender.com/openclaw`.
+The web dashboard is available at `https://<your-service>.onrender.com/setup/agent`.
+Enter your `OPENCLAW_GATEWAY_PASSWORD` when prompted.
+
+The entrypoint script seeds a default config on first boot that configures `openai/gpt-4o` as the
+primary model. To change this, go to **Settings → Config** in the Control UI.
 
 ## Render Dashboard features
 
@@ -139,8 +139,8 @@ This downloads a portable backup you can restore on any OpenClaw host.
 
 Check the deploy logs in the Render Dashboard. Common issues:
 
-- Missing `SETUP_PASSWORD` — the Blueprint prompts for this, but verify it's set
-- Port mismatch — ensure `PORT=8080` matches the Dockerfile's exposed port
+- Missing `OPENCLAW_GATEWAY_PASSWORD` — the Blueprint prompts for this, but verify it's set
+- Port mismatch — ensure `OPENCLAW_GATEWAY_PORT=8080` matches the dashboard PORT setting
 
 ### Slow cold starts (free tier)
 
