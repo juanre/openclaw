@@ -4,11 +4,13 @@ services:
     runtime: docker
     plan: standard
     healthCheckPath: /health
-    dockerCommand: node openclaw.mjs gateway --allow-unconfigured --bind lan
+    dockerCommand: /app/scripts/docker-entrypoint.sh
     envVars:
       - key: OPENCLAW_GATEWAY_PORT
         value: "8080"
       - key: OPENCLAW_GATEWAY_PASSWORD
+        sync: false
+      - key: OPENAI_API_KEY
         sync: false
       - key: OPENCLAW_STATE_DIR
         value: /data/.openclaw

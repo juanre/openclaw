@@ -11,4 +11,4 @@ if [ ! -f "$CONFIG_FILE" ]; then
   echo '{"gateway":{"controlUi":{"allowInsecureAuth":true}}}' > "$CONFIG_FILE"
 fi
 
-exec "$@"
+exec node openclaw.mjs gateway --allow-unconfigured --bind lan
