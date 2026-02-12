@@ -39,6 +39,9 @@ RUN chown -R node:node /app
 # This reduces the attack surface by preventing container escape via root privileges
 USER node
 
+# Entrypoint seeds initial config on first boot for remote deployments.
+ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
+
 # Start gateway server with default config.
 # Binds to loopback (127.0.0.1) by default for security.
 #

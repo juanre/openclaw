@@ -4,12 +4,7 @@ services:
     runtime: docker
     plan: starter
     healthCheckPath: /health
-    dockerCommand: >-
-      /bin/sh -c '
-      mkdir -p /data/.openclaw &&
-      [ -f /data/.openclaw/openclaw.json ] ||
-      echo "{\"gateway\":{\"controlUi\":{\"allowInsecureAuth\":true}}}" > /data/.openclaw/openclaw.json;
-      node openclaw.mjs gateway --allow-unconfigured --bind lan'
+    dockerCommand: node openclaw.mjs gateway --allow-unconfigured --bind lan
     envVars:
       - key: OPENCLAW_GATEWAY_PORT
         value: "10000"
